@@ -5,6 +5,11 @@ Estudos sobre o framework OAuth 2.0
 
 ![](nativeFlow.svg)
 
+
+### Authorization Code Flow for Single-Page Apps
+
+![](singlePageFlow.svg)
+
 ### Referências
 * OAuth 2.0 Authorization Framework: https://datatracker.ietf.org/doc/html/rfc6749;
 * PKCE Extension: https://datatracker.ietf.org/doc/html/rfc7636.

@@ -1,0 +1,93 @@
+@startuml
+
+title Authorization Code Flow for Single-Page Applications
+
+actor "Resource-owner" as user
+participant userAgent [
+  =User-Agent
+  ----
+  ""Browser""
+]
+participant app [
+  =Client
+  ----
+  ""JavaScript App""
+]
+participant oAuthServer [
+  =Authorization Server
+]
+participant api [
+  =Resource Server
+  ----
+  ""API""
+]
+
+autonumber
+user -> userAgent: Utiliza seu Browser
+userAgent -> app: para acessar a aplicação
+app -> app: Gera o Code Verifier (code_verifier)
+app -> app: Gera o hash do Code Verifier (code_challenge)
+app -> userAgent: "Pede" ao User-Agent para realizar a requisição\n ao Authorization Server incluindo\n o code_challenge, escopos, etc.
+
+userAgent -> oAuthServer: Inicia requisição do fluxo de autorização
+note left: Front-channel
+note left of oAuthServer #aqua
+  ""GET https://authorization-server.com/authorize?""
+  ""    response_type=**code**&""
+  ""    client_id=<<CLIENT_ID_HERE>>&""
+  ""    redirect_uri=https://example-app.com/redirect&""
+  ""    scope=<<SCOPES_LIST_HERE>>&""
+  ""    state=abcde&"" o que fizer mais sentido para o negócio
+  ""    code_challenge=<<base64url(sha256(code_verifier))>>&""
+  ""    code_challenge_method=S256""
+end note
+
+oAuthServer -> user: Apresenta uma tela de login
+user -> oAuthServer: Fornece suas credencias para fazer o login
+oAuthServer -> user: Pede o consentimento do usuário para logar na aplicação em questão
+user -> oAuthServer: Confirma seu desejo de fazer o login
+oAuthServer -> oAuthServer: Guarda o Code Challenge
+
+oAuthServer -> userAgent: Eis o Authorization Code gerado
+note left: Front-channel
+note right of userAgent #aqua
+  ""HTTP/1.1 302 Found""
+  ""Location: https://example-app.com/redirect?""
+  ""          code=<<GENERATED_CODE>>""
+  ""          state=abcde""
+end note
+
+userAgent -> app: Eis o Authorization Code gerado\n no Authorization Server
+
+app -> oAuthServer: Eis o Authorization Code, eu gostaria de trocá-lo\n por um Access Token. Aqui está também o\n Code Verifier.\n Perceba que não é enviado um client_secret
+note left: Back-channel
+note left of oAuthServer #aqua
+  ""POST https://authorization-server.com/token""
+  ""Content-Type: application/x-www-form-urlencoded""
+  
+  ""grant_type=**authorization_code**&""
+  ""code=<<GENERATED_CODE_HERE>>&""
+  ""redirect_uri=https://example-app.com/redirect&""
+  ""code_verifier=<<CODE_VERIFIER_HERE>>&""
+  ""client_id=<<CLIENT_ID_HERE>>""
+end note
+
+oAuthServer -> oAuthServer: Calcula o Code Challenge\n a partir do Code Verifier recebido\n para ver se é o mesmo do início\n do fluxo
+
+oAuthServer -> app: Aqui está um Access Token e Refresh Token
+note left: Back-channel
+note right of app #aqua
+  ""HTTP/1.1 200 OK""
+  ""Content-Type: application/json""
+  ""{""
+  ""  "token_type": "Bearer", ""
+  ""  "access_token": "jasfhasf123477234RAs", ""
+  ""  "expires_in": 3600, ""
+  ""  "scope": "<<REQUESTED_LIST_HERE>>", ""
+  ""  "refresh_token": "HSjafyy12344" ""
+  ""}""
+end note
+
+app -> api: Gostaria de consumir os recursos protegidos. Eis o Access Token.
+
+@enduml
