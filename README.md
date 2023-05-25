@@ -25,4 +25,6 @@ Para todos os fluxos acima, caso a applicação cliente necessite de um ID Token
 ### Referências
 * OAuth 2.0 Authorization Framework: https://datatracker.ietf.org/doc/html/rfc6749;
 * PKCE Extension: https://datatracker.ietf.org/doc/html/rfc7636;
-* OpenID Connect: https://openid.net/connect/.
+* OpenID Connect: https://openid.net/connect/;
+* JSON Web Token (JWT): https://datatracker.ietf.org/doc/html/rfc7519;
+* OAuth 2.0 Token Instrospection: https://datatracker.ietf.org/doc/html/rfc7662.
