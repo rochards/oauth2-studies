@@ -1,5 +1,5 @@
 # oauth2-studies
-Estudos sobre o framework OAuth 2.0
+Estudos sobre o framework OAuth 2.0 seguindo o curso disponível em https://www.udemy.com/course/oauth-2-simplified/
 
 ### Authorization Code Flow for Native Apps
 
